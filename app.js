@@ -1,87 +1,128 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-const fs = require('fs');
-const short = require('short-uuid')
+const fs = require("fs");
+// const short = require("short-uuid");
+require("dotenv").config();
+const mongoose = require("mongoose");
 
-
-app.use(express.json())
-const data = fs.readFileSync("./data.json", "utf-8")
-const userData = JSON.parse(data)
+app.use(express.json());
+const data = fs.readFileSync("./data.json", "utf-8");
+const userData = JSON.parse(data);
 // console.log(userData)
 
-app.get('/api/users', (req, res) => {
-    try{
-        if(userData.length === 0){
-            throw new Error("No data")
-        }else {
-            res.status(200).json({
-                message: "success",
-                data: userData
-            })
-        }
+/** mongo db connection */
+mongoose
+  .connect(process.env.DB_URL)
+  .then((connection) => {
+    console.log("connected to db");
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
-    }catch(err){
-        res.status(500).json({
-            message: "error",
-            data: err.message
-        })
-    }
-    
-})
+/** schemas */
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  phone: {
+    type: Number,
+    required: true,
+    unique: true,
+    minlength: 10,
+  },
+  password: {
+    type: String,
+    required: true,
+    minlength: 8,
+  },
+  confirmPassword: {
+    type: String,
+    required: true,
+    minlength: 8,
+    validate: {
+      validator: function () {
+        return this.password === this.confirmPassword;
+      },
+      message: "Password and confirm password should be same",
+    },
+  },
+});
 
-app.post('/api/users', (req, res) => {
-    try{
-        const id = short.generate()
-        const userDetails = req.body
-        userDetails.id = id
-        const isEmpty = Object.keys(userDetails).length === 0
-        if(isEmpty){
-            throw new Error("No data")
-        }
-        console.log("userDetails", userDetails)
-        userData.push(userDetails)
-        fs.writeFile("./data.json", JSON.stringify(userData), (err) => {
-            if(err){
-                throw new Error("Error writing file")
-            }else {
-                res.status(200).json({
-                    message: "success",
-                    data: userDetails
-                })
-            }
-        })
-        // res.json({
-        //     message: "success",
-        //     status: 200,
-        //     data: userDetails
-        // })
+/** models */
+const User = mongoose.model("Person", userSchema);
 
-    } catch(err){
-        res.status(500).json({
-            message: "error",
-            data: err.message
-        })
-    }
-})
+/** Route handlers */
 
-app.get('/api/users/:id', (req, res) => {
-    console.log(req.params)
-    const {id} = req.params
-    try{
-        const user = userData.find((user) => user.id == id)
-        console.log("user", user)
+async function getUserHandler(req, res) {
+  try {
+    const userData = await User.find();
+    if(userData.length === 0){
+      throw new Error("No users found")
+    } else {
         res.status(200).json({
             message: "success",
-            data: user
-        })
-    }catch(err){
-        res.status(500).json({
-            message: "error",
-            data: err.message
-        })
+            data: userData,
+        });
     }
-})
+  } catch (err) {
+    res.status(500).json({
+      message: "error",
+      data: err.message,
+    });
+  }
+}
 
+async function createUserHandler(req, res) {
+  try {
+    const userDetails = req.body;
+    const user = await User.create(userDetails);
+    res.status(200).json({
+      message: "user was created successfully",
+      data: user,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "error",
+      data: err.message,
+    });
+  }
+}
 
+async function getUserByIdHandler(req, res) {
+  const { id } = req.params;
+  try {
+    const user = await User.findById(id);
+    if(!user){
+      throw new Error("No user found")
+    } else {
+        res.status(200).json({
+            message: "success",
+            data: user,
+        });
+    }
+    
+  } catch (err) {
+    res.status(500).json({
+      message: "error",
+      data: err.message,
+    });
+  }
+}
 
-app.listen(3000, () => console.log('listening at 3000'));
+/*** Routes */
+app.get("/api/users", getUserHandler);
+
+app.post("/api/users", createUserHandler);
+
+app.get("/api/users/:id", getUserByIdHandler);
+
+app.listen(process.env.PORT, () =>
+  console.log(`listening at ${process.env.PORT}`)
+);
