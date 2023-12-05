@@ -1,20 +1,11 @@
 const express = require("express");
 const app = express();
-const fs = require("fs");
 // const short = require("short-uuid");
 require("dotenv").config();
 const mongoose = require("mongoose");
-const User = require("./models/userModel");
-const {
-  getUserHandler,
-  createUserHandler,
-  getUserByIdHandler,
-  deleteUserByIdHandler,
-  updateUserByIdHandler,
-  checkInput
-} = require("./controller/userController");
 
-const {getProductHandler, createProductHandler} = require("./controller/productController");
+const userRouter = require("./router/userRouter");
+const productRouter = require("./router/productRouter");
 
 app.use(express.json());
 // console.log(userData)
@@ -29,20 +20,18 @@ mongoose
     console.log(err);
   });
 // app.use(checkInput);
+
 /*** Routes */
-app.get("/api/users", getUserHandler);
 
-app.post("/api/users", checkInput, createUserHandler);
-
-app.get("/api/users/:id", getUserByIdHandler);
-
-app.patch("/api/users/:id", updateUserByIdHandler);
-
-app.delete("/api/users/:id", deleteUserByIdHandler);
-
-/** routes for prosducts */
-app.get("/api/products", getProductHandler);
-app.post("/api/products", createProductHandler);
+app.use("/api/users", userRouter);
+app.use("/api/products", productRouter);
+app.use("/search", (req, res) => {
+  console.log(req.query);
+  res.status(200).json({
+    message: "success",
+    data: req.query,
+  });
+});
 
 app.listen(process.env.PORT, () =>
   console.log(`listening at ${process.env.PORT}`)
