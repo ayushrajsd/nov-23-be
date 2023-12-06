@@ -22,7 +22,7 @@ mongoose
 // app.use(checkInput);
 
 /*** Routes */
-
+// get -> "/api/users/1234"
 app.use("/api/users", userRouter);
 app.use("/api/products", productRouter);
 app.use("/search", (req, res) => {

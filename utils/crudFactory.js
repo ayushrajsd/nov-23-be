@@ -52,14 +52,16 @@ const createFactory = (elementModel) =>
 
 const getElementByIdFactory = (elementModel) =>
   async function (req, res) {
+    console.log(elementModel.modelName);
     try {
       const { id } = req.params; // 1234
+      console.log(id);
       const data = await elementModel.findById(id);
       if (!data) {
         // throw new Error("No data found");
         res.status(404).json({
             message: "error",
-            data: "No data found",
+            data: `No ${elementModel.modelName} found`,
         })
       } else {
         res.status(200).json({
@@ -74,12 +76,12 @@ const getElementByIdFactory = (elementModel) =>
       });
     }
   };
-
-const updateElementByIdFactory = (elementModel) => async function (req, res) {
+// async function updateElementByIdFactory(elementModel) {}
+const updateElementByIdFactory = (elementModel) => async function (req, res) { // functiojn expressions
   try {
     const { id } = req.params;
     const details = req.body;
-    const updatedData = await elementModel.findByIdAndUpdate(id, details, {
+    const updatedData = await elementModel.findByIdAndUpdate(id,  { $set: details, $inc: { __v: 1 } }, {
       new: true,
     });
     if (!updatedData) {
