@@ -32,7 +32,6 @@ const userSchema = new mongoose.Schema({
     },
     confirmPassword: {
       type: String,
-      required: true,
       minlength: 8,
       validate: {
         validator: function () {
@@ -40,7 +39,10 @@ const userSchema = new mongoose.Schema({
         },
         message: "Password and confirm password should be same",
       },
+     
     },
+    token: String,
+    otpExpiry: Date,
   });
 
   userSchema.pre("save",function(){
