@@ -43,10 +43,28 @@ const userSchema = new mongoose.Schema({
     },
     token: String,
     otpExpiry: Date,
+    role:{
+      type:String,
+      default:"user"
+    }
   });
 
-  userSchema.pre("save",function(){
+  const validRoles = ["admin","user","sales"];
+
+  userSchema.pre("save",function(next){
     this.confirmPassword = undefined;
+    if(this.role){
+      console.log(this.role);
+      const isValid = validRoles.includes(this.role);
+      if(!isValid){
+       throw new Error(`Invalid role ${this.role}`);
+      }else{
+        next();
+      }
+
+    }else {
+      this.role = "user";
+    }
   })
   
   

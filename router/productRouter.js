@@ -9,15 +9,18 @@ const {
   deleteProductByIdHandler,
 } = require("../controller/productController");
 const { checkInput } = require("../utils/crudFactory");
+const { protectRoute, isAuthorized } = require("../controller/authController");
 
 const productRouter = express.Router();
 
+const productValidRoles = ["admin", "seller"];
+
 productRouter.get("/", getAllProduts);
-productRouter.post("/", checkInput, createProductHandler);
+productRouter.post("/", checkInput, protectRoute,  isAuthorized(productValidRoles),createProductHandler);
 productRouter.get("/bigBillionDay", getBigBillionDayProducts, getAllProduts); // share the same req, res object as getAllProducts
 productRouter.get("/:id", getProductByIdHandler);
 productRouter.patch("/:id", updateProductByIdHandler);
-productRouter.delete("/:id", deleteProductByIdHandler);
+productRouter.delete("/:id", protectRoute,  isAuthorized(productValidRoles),deleteProductByIdHandler);
 
 async function getAllProduts(req, res) {
   console.log(req.query);

@@ -3,11 +3,14 @@ const app = express();
 // const short = require("short-uuid");
 require("dotenv").config();
 const mongoose = require("mongoose");
+ const cookieParser = require("cookie-parser");
 
 const userRouter = require("./router/userRouter");
 const productRouter = require("./router/productRouter");
+const authRouter = require("./router/authRouter");
 
 app.use(express.json());
+app.use(cookieParser());
 // console.log(userData)
 
 /** mongo db connection */
@@ -25,6 +28,7 @@ mongoose
 // get -> "/api/users/1234"
 app.use("/api/users", userRouter);
 app.use("/api/products", productRouter);
+app.use("/api/auth", authRouter);
 app.use("/search", (req, res) => {
   console.log(req.query);
   res.status(200).json({
