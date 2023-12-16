@@ -8,6 +8,8 @@ const mongoose = require("mongoose");
 const userRouter = require("./router/userRouter");
 const productRouter = require("./router/productRouter");
 const authRouter = require("./router/authRouter");
+const bookingRouter = require("./router/bookingRouter");
+const reviewRouter = require("./router/reviewRouter");
 
 app.use(express.json());
 app.use(cookieParser());
@@ -29,6 +31,9 @@ mongoose
 app.use("/api/users", userRouter);
 app.use("/api/products", productRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/booking", bookingRouter);
+app.use("/api/reviews", reviewRouter);
+
 app.use("/search", (req, res) => {
   console.log(req.query);
   res.status(200).json({

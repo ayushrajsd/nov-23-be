@@ -43,7 +43,17 @@ const productSchema = new mongoose.Schema({
     brand:{
         type:String,
         required:[true,'A product must have a brand'],
-    }
+    },
+    reviews:{
+        type:[mongoose.Schema.ObjectId],
+        ref:'Review'
+    },
+    averageRating:{
+        type:Number,
+        default:0,
+        min:0,
+        max:5
+    },
 })
 
 const validProductCategories = ['electronics','stationery','clothing','furniture']
