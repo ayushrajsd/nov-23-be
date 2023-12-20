@@ -54,7 +54,12 @@ const loginHandler = async function (req, res) {
               maxAge: 1000 * 60 * 60 * 24 * 7,
               httpOnly: true,
             });
-            res.status(200).json({ status: "success", message: data, user: user });
+            res.status(200).json({ status: "success", message: data, user: {
+              name:user.name,
+              email:user.email,
+              role:user.role,
+              _id:user._id
+            } });
           }
         );
       } else {

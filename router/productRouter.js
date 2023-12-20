@@ -7,6 +7,7 @@ const {
   getProductByIdHandler,
   updateProductByIdHandler,
   deleteProductByIdHandler,
+  getProductCategories,
 } = require("../controller/productController");
 const { checkInput } = require("../utils/crudFactory");
 const { protectRoute, isAuthorized } = require("../controller/authController");
@@ -18,6 +19,7 @@ const productValidRoles = ["admin", "seller"];
 productRouter.get("/", getAllProduts);
 productRouter.post("/", checkInput, protectRoute,  isAuthorized(productValidRoles),createProductHandler);
 productRouter.get("/bigBillionDay", getBigBillionDayProducts, getAllProduts); // share the same req, res object as getAllProducts
+productRouter.get('/categories',getProductCategories)
 productRouter.get("/:id", getProductByIdHandler);
 productRouter.patch("/:id", updateProductByIdHandler);
 productRouter.delete("/:id", protectRoute,  isAuthorized(productValidRoles),deleteProductByIdHandler);

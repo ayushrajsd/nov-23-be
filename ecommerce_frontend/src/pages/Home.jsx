@@ -7,6 +7,8 @@ import ProductList from '../components/ProductList';
 import Categories from '../components/Categories';
 import basicOps from '../utility/basicOps';
 import { usePaginationContext } from '../contexts/PaginationContext';
+import axios from 'axios';
+import URL from '../../urlConfig'
 
 function Home() {
     // preserver -> pagination
@@ -28,21 +30,35 @@ function Home() {
     /****************get all the products*********************/
     useEffect(() => {
         (async function () {
-            const resp = await fetch(`https://fakestoreapi.com/products`)
-            console.log(resp);
-            const anotherResp = await fetch("/api/product");
+            // const resp = await fetch(`https://fakestoreapi.com/products`)
+            // console.log(resp);
+            // const anotherResp = await fetch("/api/product");
             
-            const productData = await resp.json();
-            setProducts(productData);
+            // const productData = await resp.json();
+            const productData = await axios.get(URL.GET_PRODUCTS_URL);
+            const productArr = productData.data.data;
+            const productList = productArr.map((product) => {
+                return {
+                    id: product._id,
+                    title: product.name,
+                    image: product.images[0],
+                    ...product
+                }
+            })
+            console.log("products",productData);
+            setProducts(productList);
+
         })()
     }, [])
 
     /**************getting all the categroies ********************/
     useEffect(() => {
         (async function () {
-            const resp = await fetch(`https://fakestoreapi.com/products/categories`)
-            const categoriesData = await resp.json();
-            setCategories(categoriesData);
+            // const resp = await fetch(`https://fakestoreapi.com/products/categories`)
+            // const categoriesData = await resp.json();
+            const categoriesData = await axios.get(URL.GET_CATEGORIES);
+            console.log("categories",categoriesData);
+            setCategories(categoriesData.data.data);
         })()
     }, [])
     const object = basicOps(products, searchTerm, sortDir, currCategory, pageNum, pageSize);

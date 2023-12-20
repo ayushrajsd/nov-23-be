@@ -112,6 +112,14 @@ const checkInput = function (req, res, next) {
       });
     }
   }
+
+  const getProductCategories = async (req, res) => {
+    res.json({
+      message: "success",
+      data: ["electronics", "men's clothing", "women's clothing", "jewelery"],
+    });
+  }
+
   
   module.exports = {
     getProductHandler,
@@ -120,4 +128,5 @@ const checkInput = function (req, res, next) {
     updateProductByIdHandler,
     deleteProductByIdHandler,
     checkInput,
+    getProductCategories
   };
