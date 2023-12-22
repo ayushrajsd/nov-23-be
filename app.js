@@ -15,7 +15,14 @@ const reviewRouter = require("./router/reviewRouter");
 app.use(express.json());
 app.use(cookieParser());
 // app.use(cors());
-app.use(cors({ origin: "http://localhost:5173", credentials: true}));
+// app.use(cors({ origin: "http://localhost:5173", credentials: true}));
+const corsConfig = {
+  origin: true,
+  credentials: true,
+};
+// this is allowing all the requests
+app.use(cors(corsConfig));
+app.options('*', cors(corsConfig));
 // console.log(userData)
 
 /** mongo db connection */
